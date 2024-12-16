@@ -8,6 +8,8 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
 import pandas as pd
+from sklearn.ensemble import (RandomForestClassifier, AdaBoostClassifier, 
+                            GradientBoostingClassifier, ExtraTreesClassifier)
 
 import CLASS_TABLE, ATTRIBUTE_TABLE, PLOT, CLIPPING,WARNINGS
 
@@ -219,20 +221,27 @@ class View(QtWidgets.QMainWindow):
                 WARNINGS.warning_message("No samples selected", "Please select samples using clipping before inferring classes.")
                 return
                 
+            # Convert clipped_samples list to numpy array
+            clipped_samples_array = np.array(self.controller.data.clipped_samples)
+            
             # Get training data (all unclipped samples)
-            train_mask = ~self.controller.data.clipped_samples.astype(bool)
+            train_mask = ~clipped_samples_array.astype(bool)
             X_train = self.controller.data.dataframe.iloc[train_mask].drop('class', axis=1)
             y_train = self.controller.data.dataframe.iloc[train_mask]['class']
             
             # Get samples to predict (clipped samples)
-            test_mask = self.controller.data.clipped_samples.astype(bool)
+            test_mask = clipped_samples_array.astype(bool)
             X_test = self.controller.data.dataframe.iloc[test_mask].drop('class', axis=1)
             
             # Initialize classifiers
             classifiers = {
                 'KNN': KNeighborsClassifier(n_neighbors=3),
                 'SVM': SVC(kernel='rbf', probability=True),
-                'Naive Bayes': GaussianNB()
+                'Naive Bayes': GaussianNB(),
+                'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+                'AdaBoost': AdaBoostClassifier(n_estimators=100, random_state=42),
+                'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42),
+                'Extra Trees': ExtraTreesClassifier(n_estimators=100, random_state=42)
             }
             
             # Train and predict with each classifier
@@ -251,15 +260,19 @@ class View(QtWidgets.QMainWindow):
         # Create table window
         table_window = QtWidgets.QDialog(self)
         table_window.setWindowTitle("Class Inference Results")
-        table_window.resize(600, 400)
+        table_window.resize(1200, 600)  # Increased size to accommodate more columns
         
         # Create table
         table = QTableWidget()
-        table.setColumnCount(4)  # Sample ID, KNN, SVM, NB
+        classifier_names = [
+            'KNN', 'SVM', 'Naive Bayes', 'Random Forest', 'AdaBoost',
+            'Gradient Boosting', 'Extra Trees'
+        ]
+        table.setColumnCount(len(classifier_names) + 1)  # +1 for Sample ID
         table.setRowCount(len(sample_indices))
         
         # Set headers
-        headers = ['Sample ID', 'KNN', 'SVM', 'Naive Bayes']
+        headers = ['Sample ID'] + classifier_names
         table.setHorizontalHeaderLabels(headers)
         
         # Fill table
@@ -268,7 +281,7 @@ class View(QtWidgets.QMainWindow):
             table.setItem(row, 0, QTableWidgetItem(str(idx)))
             
             # Predictions from each classifier
-            for col, classifier_name in enumerate(['KNN', 'SVM', 'Naive Bayes'], start=1):
+            for col, classifier_name in enumerate(classifier_names, start=1):
                 prediction = results[classifier_name]['predictions'][row]
                 probs = results[classifier_name]['probabilities'][row]
                 max_prob = max(probs)
@@ -282,6 +295,23 @@ class View(QtWidgets.QMainWindow):
         # Create layout
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(table)
+        
+        # Add a label showing prediction agreement
+        agreement_label = QtWidgets.QLabel()
+        layout.addWidget(agreement_label)
+        
+        # Calculate and show prediction agreement
+        for row in range(len(sample_indices)):
+            predictions = [results[clf]['predictions'][row] for clf in classifier_names]
+            unique_predictions = set(predictions)
+            if len(unique_predictions) == 1:
+                agreement_label.setText(f"All classifiers agree on predictions!")
+            else:
+                most_common = max(set(predictions), key=predictions.count)
+                agreement_count = predictions.count(most_common)
+                agreement_label.setText(
+                    f"Most common prediction appears in {agreement_count}/{len(classifier_names)} classifiers"
+                )
         
         # Add close button
         close_button = QtWidgets.QPushButton("Close")
