@@ -1,12 +1,12 @@
 # DCVis: Dynamic Coordinate Visualization System
 
-DCVis is software for Visual Knowledge Discovery (VKD) developed at Central Washington University's Visual Knowledge Discovery Lab. Initiated in 2022, the project is built by Alice Williams, James Battistoni IV, Charles Recaido, and Dr. Boris Kovalerchuk.
+DCVis allows users to interactively build visual ML models for classifying new data. It offers tools to explore multidimensional data using General Line Coordinate visualizations and includes features for interactive classification and synthetic data generation to enhance supervised learning models. Synthetic samples can be tested against standard KNN, SVM, and Naive Bayes classifiers.
 
-DCVis allows users to interactively build visual ML models for classifying new data. It offers tools to explore multidimensional data using General Line Coordinate visualizations and includes features for interactive classification and synthetic data generation to enhance supervised learning models.
+Experiments with DCVis have demonstrated insufficiencies in synthetic data generation and automated data labeling methods such as SMOTE, which are critical for the development of AI/ML models due to the need for large datasets for training. We have developed a new method for synthetic data generation and automated data labeling which is described in [2] using the formerly developed visualization methods for model development from [3]. Next, we are developing new methods for defining the class boundaries in multidimensional data using interactive visual ML [1].
 
 ## Demo Video
 
-Please see a quick 3 minute video to watch the software in action [here](https://youtu.be/a0F5xT2oiZ8).
+Quick 3 minute video [here](https://youtu.be/a0F5xT2oiZ8).
 
 ## Requirements
 
@@ -188,15 +188,20 @@ DCC Iris Setosa and Versicolor classes with LDA coefficients separation
 
 ## Software Issues
 
-If you encounter any difficulties with the software please submit an issue with screenshots of the behavior occurring and explanation of the expected behavior.
+If you encounter any problems with the software please submit an issue with screenshots of the behavior occurring and system used.
 
-## Key Publications
+## Publications Supported
 
-- **[Preprint] Synthetic Data Generation and Automated Multidimensional Data Labeling for AI/ML in General and Circular Coordinates** by Alice Williams and Dr. Boris Kovalerchuk
-- **[Interpretable Machine Learning for Self-Service High-Risk Decision-Making](https://arxiv.org/abs/2205.04032)** by Charles Recaido and Dr. Boris Kovalerchuk
+[1] Williams A., Kovalerchuk B., Representation Learning with Visual Knowledge Discovery, Human Computer Interaction International 2025 to be published as proceedings in Springer.
 
-DCVis is a complete rebuild of the [DSCVis](https://github.com/Charles57-CWU/DSCVis) software, with new visualizations and enhanced tools.
+[2] Williams A., Kovalerchuk B., Synthetic Data Generation and Automated Multidimensional Data Labeling for AI/ML in General and Circular Coordinates, 2024 28th International Conference Information Visualisation (IV), pp.272-279, 2024, IEEE. Arxiv:2409.02079
+
+[3] Recaido C., Kovalerchuk B., Interpretable Machine Learning for Self-Service High-Risk Decision-Making, in: 26th International Conference Information Visualisation, 2022, pp. 322–329, IEEE,  arXiv:2205.04032.
+
+DCVis is a complete rebuild of the [DSCVis](https://github.com/Charles57-CWU/DSCVis) software, with new visualizations and enhanced tools which was built for [2].
+
+DCVis is software developed at Central Washington University's Visual Knowledge Discovery and Imaging Lab. Initiated in 2022, the project is built by Alice Williams, James Battistoni IV, Charles Recaido, and led by Dr. Boris Kovalerchuk.
 
 ## Licensing
 
-DCVis is licensed under the MIT License, allowing both personal and commercial use. For full details, see the `LICENSE` file.
+DCVis is freely and open source software licensed under the MIT License, allowing for both personal and commercial use. For full license details, see the `LICENSE` file.
