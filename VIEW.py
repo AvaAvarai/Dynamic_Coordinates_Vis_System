@@ -3,6 +3,11 @@ from PyQt6.QtWidgets import QColorDialog
 from PyQt6.uic.load_ui import loadUi
 import numpy as np
 from PyQt6.QtWidgets import QApplication
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
+import pandas as pd
 
 import CLASS_TABLE, ATTRIBUTE_TABLE, PLOT, CLIPPING,WARNINGS
 
@@ -208,8 +213,83 @@ class View(QtWidgets.QMainWindow):
                 self.plot_layout.removeWidget(self.plot_widget)
             self.plot_widget = PLOT.Plot(self.controller.data, self.highlight_overlaps_toggle, self.overlaps_textbox, self.controller.view.replot_overlaps_btn, parent=self)
             self.plot_layout.addWidget(self.plot_widget)
+        elif key == QtCore.Qt.Key.Key_Question:
+            # Only proceed if we have clipped samples
+            if not np.any(self.controller.data.clipped_samples):
+                WARNINGS.warning_message("No samples selected", "Please select samples using clipping before inferring classes.")
+                return
+                
+            # Get training data (all unclipped samples)
+            train_mask = ~self.controller.data.clipped_samples.astype(bool)
+            X_train = self.controller.data.dataframe.iloc[train_mask].drop('class', axis=1)
+            y_train = self.controller.data.dataframe.iloc[train_mask]['class']
             
-        self.refresh()
+            # Get samples to predict (clipped samples)
+            test_mask = self.controller.data.clipped_samples.astype(bool)
+            X_test = self.controller.data.dataframe.iloc[test_mask].drop('class', axis=1)
+            
+            # Initialize classifiers
+            classifiers = {
+                'KNN': KNeighborsClassifier(n_neighbors=3),
+                'SVM': SVC(kernel='rbf', probability=True),
+                'Naive Bayes': GaussianNB()
+            }
+            
+            # Train and predict with each classifier
+            results = {}
+            for name, clf in classifiers.items():
+                clf.fit(X_train, y_train)
+                predictions = clf.predict(X_test)
+                probabilities = clf.predict_proba(X_test)
+                results[name] = {'predictions': predictions, 'probabilities': probabilities}
+            
+            # Create and show results table
+            self.show_inference_results(results, X_test.index)
+            
+    def show_inference_results(self, results, sample_indices):
+        """Display the inference results in a table."""
+        # Create table window
+        table_window = QtWidgets.QDialog(self)
+        table_window.setWindowTitle("Class Inference Results")
+        table_window.resize(600, 400)
+        
+        # Create table
+        table = QTableWidget()
+        table.setColumnCount(4)  # Sample ID, KNN, SVM, NB
+        table.setRowCount(len(sample_indices))
+        
+        # Set headers
+        headers = ['Sample ID', 'KNN', 'SVM', 'Naive Bayes']
+        table.setHorizontalHeaderLabels(headers)
+        
+        # Fill table
+        for row, idx in enumerate(sample_indices):
+            # Sample ID
+            table.setItem(row, 0, QTableWidgetItem(str(idx)))
+            
+            # Predictions from each classifier
+            for col, classifier_name in enumerate(['KNN', 'SVM', 'Naive Bayes'], start=1):
+                prediction = results[classifier_name]['predictions'][row]
+                probs = results[classifier_name]['probabilities'][row]
+                max_prob = max(probs)
+                text = f"{prediction} ({max_prob:.2f})"
+                item = QTableWidgetItem(text)
+                table.setItem(row, col, item)
+        
+        # Adjust column widths
+        table.resizeColumnsToContents()
+        
+        # Create layout
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(table)
+        
+        # Add close button
+        close_button = QtWidgets.QPushButton("Close")
+        close_button.clicked.connect(table_window.close)
+        layout.addWidget(close_button)
+        
+        table_window.setLayout(layout)
+        table_window.exec()
 
     # function to refresh plot
     def refresh(self):
