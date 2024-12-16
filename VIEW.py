@@ -8,8 +8,8 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
 import pandas as pd
-from sklearn.ensemble import (RandomForestClassifier, AdaBoostClassifier, 
-                            GradientBoostingClassifier, ExtraTreesClassifier)
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, ExtraTreesClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 import CLASS_TABLE, ATTRIBUTE_TABLE, PLOT, CLIPPING,WARNINGS
 
@@ -235,6 +235,7 @@ class View(QtWidgets.QMainWindow):
             
             # Initialize classifiers
             classifiers = {
+                'DT': DecisionTreeClassifier(random_state=42),
                 'KNN': KNeighborsClassifier(n_neighbors=3),
                 'SVM': SVC(kernel='rbf', probability=True),
                 'Naive Bayes': GaussianNB(),
@@ -265,7 +266,7 @@ class View(QtWidgets.QMainWindow):
         # Create table
         table = QTableWidget()
         classifier_names = [
-            'KNN', 'SVM', 'Naive Bayes', 'Random Forest', 'AdaBoost',
+            'DT', 'KNN', 'SVM', 'Naive Bayes', 'Random Forest', 'AdaBoost',
             'Gradient Boosting', 'Extra Trees'
         ]
         table.setColumnCount(len(classifier_names) + 1)  # +1 for Sample ID
