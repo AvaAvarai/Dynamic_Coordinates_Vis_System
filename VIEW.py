@@ -152,11 +152,13 @@ class View(QtWidgets.QMainWindow):
                 self.controller.data.roll_clips(-1)
             else:
                 self.controller.data.roll_vertex_in(-1)
+            self.refresh()
         elif key == QtCore.Qt.Key.Key_E:
             if self.controller.data.plot_type not in ['SCC', 'DCC']:
                 self.controller.data.roll_clips(1)
             else:
                 self.controller.data.roll_vertex_in(1)
+            self.refresh()
         elif key == QtCore.Qt.Key.Key_W:
             # move data samples up by 0.1 on all attributes and replot
             self.controller.data.move_samples(0.01)

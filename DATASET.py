@@ -202,47 +202,37 @@ class Dataset:
         self.class_colors = [class_color_mapping[class_name] for class_name in self.class_names]
 
     def copy_clip(self):
+        """
+        Clone cases with the same values and class colors as the selected (clipped) cases.
+        """
         if self.dataframe is None or self.dataframe.empty:
             print("DataFrame is not loaded or is empty.")
             return
         if not any(self.clipped_samples):
-            print("No samples selected.")
+            print("No samples selected for cloning.")
             return
 
-        # Ensure clipped_samples is a boolean array
-        bool_clipped = np.array(self.clipped_samples, dtype=bool)
-        
-        # Get the clipped data
-        clipped_df = self.dataframe[bool_clipped].copy()
-        clipped_non_normalized_df = self.not_normalized_frame[bool_clipped].copy()
+        # Identify clipped samples
+        clipped_indices = np.where(self.clipped_samples)[0]
+        if len(clipped_indices) == 0:
+            print("No clipped indices found.")
+            return
 
-        # Append the clipped data to the original dataframes
-        self.dataframe = pd.concat([self.dataframe, clipped_df], ignore_index=True)
-        self.not_normalized_frame = pd.concat([self.not_normalized_frame, clipped_non_normalized_df], ignore_index=True)
+        # Filter rows to clone
+        cloned_rows = self.dataframe.iloc[clipped_indices].copy()
 
-        # Update sample count and count per class
-        self.sample_count = len(self.dataframe.index)
+        # Duplicate the selected rows
+        for i in range(len(cloned_rows)):
+            new_row = cloned_rows.iloc[i]
+            self.dataframe = self.dataframe._append(new_row, ignore_index=True)
+            self.not_normalized_frame = self.not_normalized_frame._append(new_row, ignore_index=True)
+
+        # Update sample count and clipping arrays
+        self.sample_count = len(self.dataframe)
+        # update the class counts
         self.count_per_class = [self.dataframe['class'].tolist().count(name) for name in self.class_names]
-
-        # Initialize the expanded clipped_samples array with the newly added samples as true
-        new_clipped_samples = np.zeros(self.sample_count, dtype=bool)
-        new_clipped_samples[-len(clipped_df):] = True
-
-        # Sort the dataframe by class
-        self.dataframe = self.dataframe.sort_values(by='class').reset_index(drop=True)
-        self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class').reset_index(drop=True)
-
-        # Reset previous clipped samples to false
-        self.clipped_samples = new_clipped_samples
-        self.clear_samples = np.repeat(False, self.sample_count)
-        self.vertex_in = np.repeat(False, self.sample_count)
-        self.last_vertex_in = np.repeat(False, self.sample_count)
-
-        self.positions = [self.dataframe.iloc[:, i].values for i in range(self.attribute_count)]
-
-        self.clear_samples = np.zeros(self.sample_count, dtype=bool)
-        self.vertex_in = np.zeros(self.sample_count, dtype=bool)
-        self.last_vertex_in = np.zeros(self.sample_count, dtype=bool)
+        self.clipped_samples = np.append(self.clipped_samples, [False] * len(cloned_rows))
+        self.clear_samples = np.append(self.clear_samples, [False] * len(cloned_rows))
 
     def move_samples(self, move_delta: int):
         """Move the selected samples up or down in the dataframe."""
