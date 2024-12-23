@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 import os
 import random
-from sklearn.preprocessing import MinMaxScaler
+from ctgan import CTGAN
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
 import COLORS
 
@@ -236,9 +237,37 @@ class Dataset:
         self.clear_samples = np.append(self.clear_samples, [False] * len(cloned_rows))
 
     def generate_data(self, num_samples: int):
-        """Generate a specified number of samples."""
-        for _ in range(num_samples):
-            self.inject_datapoint([random.uniform(0, 1) for _ in range(self.attribute_count)], random.choice(self.class_names))
+        """Generate a specified number of samples using CTGAN."""
+        # Initialize CTGAN
+        ctgan = CTGAN(verbose=True)
+
+        # Separate features and labels
+        features = self.dataframe[self.attribute_names]
+        labels = self.dataframe['class']
+
+        # Encode categorical labels as integers
+        label_encoder = LabelEncoder()
+        encoded_labels = label_encoder.fit_transform(labels)
+
+        # Concatenate features and encoded labels
+        features_with_labels = features.copy()
+        features_with_labels['class_encoded'] = encoded_labels
+
+        # Train CTGAN
+        discrete_columns = ['class_encoded']  # Specify discrete columns
+        ctgan.fit(features_with_labels, discrete_columns)
+
+        # Generate synthetic samples
+        synthetic_data = ctgan.sample(num_samples)
+
+        # Decode labels back to original class names
+        synthetic_data['class_encoded'] = label_encoder.inverse_transform(synthetic_data['class_encoded'])
+        synthetic_features = synthetic_data.drop(columns=['class_encoded'])
+        synthetic_labels = synthetic_data['class_encoded']
+
+        # Inject synthetic samples into the dataframe
+        for i in range(len(synthetic_features)):
+            self.inject_datapoint(synthetic_features.iloc[i].tolist(), synthetic_labels.iloc[i])
 
     def move_samples(self, move_delta: int):
         """Move the selected samples up or down in the dataframe."""
