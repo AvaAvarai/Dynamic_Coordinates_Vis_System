@@ -25,6 +25,8 @@ class HelpDialog(QDialog):
           C: Clone selected data points
           I: Insert new data point of selected class
           P: Print the highlighted case details to the console
+          ?: Infers the class of the highlighted case(s).
+          G: Generate a specified number of data points (currently completely random)
             
         Mouse Controls for Plot Interaction:
           Left Click: Select and highlight data points.

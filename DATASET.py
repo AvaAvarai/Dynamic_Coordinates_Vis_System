@@ -3,6 +3,7 @@ import WARNINGS
 import pandas as pd
 import numpy as np
 import os
+import random
 from sklearn.preprocessing import MinMaxScaler
 
 import COLORS
@@ -233,6 +234,11 @@ class Dataset:
         self.count_per_class = [self.dataframe['class'].tolist().count(name) for name in self.class_names]
         self.clipped_samples = np.append(self.clipped_samples, [False] * len(cloned_rows))
         self.clear_samples = np.append(self.clear_samples, [False] * len(cloned_rows))
+
+    def generate_data(self, num_samples: int):
+        """Generate a specified number of samples."""
+        for _ in range(num_samples):
+            self.inject_datapoint([random.uniform(0, 1) for _ in range(self.attribute_count)], random.choice(self.class_names))
 
     def move_samples(self, move_delta: int):
         """Move the selected samples up or down in the dataframe."""

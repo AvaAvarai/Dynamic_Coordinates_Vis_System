@@ -217,6 +217,22 @@ class View(QtWidgets.QMainWindow):
                 self.plot_layout.removeWidget(self.plot_widget)
             self.plot_widget = PLOT.Plot(self.controller.data, self.highlight_overlaps_toggle, self.overlaps_textbox, self.controller.view.replot_overlaps_btn, parent=self)
             self.plot_layout.addWidget(self.plot_widget)
+        elif key == QtCore.Qt.Key.Key_G:
+            num_samples = QtWidgets.QInputDialog.getInt(self, "Generate Data", "Enter the number of samples to generate:", 100, 1, 1000000)
+            if num_samples[1]:
+                self.controller.data.generate_data(num_samples[0])
+            else:
+                return
+            self.controller.display_data()
+            back_color = self.controller.view.plot_widget.background_color
+            axes_color = self.controller.view.plot_widget.axes_color
+            if self.plot_widget:
+                self.plot_layout.removeWidget(self.plot_widget)
+            self.plot_widget = PLOT.Plot(self.controller.data, self.highlight_overlaps_toggle, self.overlaps_textbox, self.controller.view.replot_overlaps_btn, parent=self)
+            self.plot_layout.addWidget(self.plot_widget)
+            self.controller.view.plot_widget.background_color = back_color
+            self.controller.view.plot_widget.axes_color = axes_color
+            
         elif key == QtCore.Qt.Key.Key_Question:
             # Only proceed if we have clipped samples
             if not np.any(self.controller.data.clipped_samples):
