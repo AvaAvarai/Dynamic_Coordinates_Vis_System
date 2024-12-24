@@ -235,6 +235,9 @@ class Dataset:
         self.count_per_class = [self.dataframe['class'].tolist().count(name) for name in self.class_names]
         self.clipped_samples = np.append(self.clipped_samples, [False] * len(cloned_rows))
         self.clear_samples = np.append(self.clear_samples, [False] * len(cloned_rows))
+        
+        self.vertex_in = np.append(self.vertex_in, [False] * len(cloned_rows))
+        self.last_vertex_in = np.append(self.last_vertex_in, [False] * len(cloned_rows))
 
     def generate_data(self, num_samples: int, epochs: int):
         """Generate a specified number of samples using CTGAN."""
