@@ -236,10 +236,10 @@ class Dataset:
         self.clipped_samples = np.append(self.clipped_samples, [False] * len(cloned_rows))
         self.clear_samples = np.append(self.clear_samples, [False] * len(cloned_rows))
 
-    def generate_data(self, num_samples: int):
+    def generate_data(self, num_samples: int, epochs: int):
         """Generate a specified number of samples using CTGAN."""
         # Initialize CTGAN
-        ctgan = CTGAN(verbose=True)
+        ctgan = CTGAN(epochs=epochs, verbose=True)
 
         # Separate features and labels
         features = self.dataframe[self.attribute_names]

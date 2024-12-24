@@ -218,9 +218,34 @@ class View(QtWidgets.QMainWindow):
             self.plot_widget = PLOT.Plot(self.controller.data, self.highlight_overlaps_toggle, self.overlaps_textbox, self.controller.view.replot_overlaps_btn, parent=self)
             self.plot_layout.addWidget(self.plot_widget)
         elif key == QtCore.Qt.Key.Key_G:
-            num_samples = QtWidgets.QInputDialog.getInt(self, "Generate Data", "Enter the number of samples to generate:", 100, 1, 1000000)
-            if num_samples[1]:
-                self.controller.data.generate_data(num_samples[0])
+            dialog = QtWidgets.QDialog(self)
+            dialog.setWindowTitle("Generate Data")
+            layout = QtWidgets.QVBoxLayout()
+            dialog.setLayout(layout)
+
+            num_samples_label = QtWidgets.QLabel("Enter the number of samples to generate:")
+            layout.addWidget(num_samples_label)
+            num_samples_spinbox = QtWidgets.QSpinBox()
+            num_samples_spinbox.setMinimum(1)
+            num_samples_spinbox.setMaximum(1000000)
+            num_samples_spinbox.setValue(100)
+            layout.addWidget(num_samples_spinbox)
+
+            epochs_label = QtWidgets.QLabel("Enter the number of epochs to train CTGAN:")
+            layout.addWidget(epochs_label)
+            epochs_spinbox = QtWidgets.QSpinBox()
+            epochs_spinbox.setMinimum(1)
+            epochs_spinbox.setMaximum(1000000)
+            epochs_spinbox.setValue(1000)
+            layout.addWidget(epochs_spinbox)
+
+            buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+            layout.addWidget(buttons)
+            buttons.accepted.connect(dialog.accept)
+            buttons.rejected.connect(dialog.reject)
+
+            if dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+                self.controller.data.generate_data(num_samples_spinbox.value(), epochs_spinbox.value())
             else:
                 return
             self.controller.display_data()
