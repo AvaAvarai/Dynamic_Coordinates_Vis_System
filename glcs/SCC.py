@@ -1,5 +1,5 @@
 import numpy as np
-import DATASET
+import MODEL
 
 
 def compute_coordinates(data, df, class_index):
@@ -47,7 +47,7 @@ def compute_coordinates(data, df, class_index):
 
 
 class SCC:
-    def __init__(self, data: DATASET.Dataset):
+    def __init__(self, data: MODEL.Dataset):
         data.vertex_count = data.attribute_count
         data.dataframe = data.normalize_data(our_range=(0, 1))
 

@@ -1,5 +1,5 @@
 import numpy as np
-import DATASET
+import MODEL
 
 
 def compute_positions(data, df_name, section_array):
@@ -24,8 +24,8 @@ def compute_axis_positions(data, section_array):
 
 
 class PC:
-    def __init__(self, data: DATASET.Dataset):
-        # Normalization using the DATASET class function
+    def __init__(self, data: MODEL.Dataset):
+        # Normalization using the MODEL class function
         data.dataframe = data.normalize_data(our_range=(0, 1))
 
         # Create section_array based on vertex_count

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from csv import writer
 import os
-import DATASET
+import MODEL
 
 # exit codes for cohen-sutherland
 INSIDE = 0  # 0000b

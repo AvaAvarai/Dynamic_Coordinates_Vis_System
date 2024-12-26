@@ -4,7 +4,7 @@ from ui import HELP_DIALOG, ABOUT_DIALOG, CLASS_TABLE
 
 import sys
 
-import DATASET
+import MODEL
 
 class Controller:
     def __init__(self, view, dataset=None):
@@ -96,7 +96,7 @@ class Controller:
         if self.data:
             del self.data
 
-        self.data = DATASET.Dataset()
+        self.data = MODEL.Dataset()
         filename = QtWidgets.QFileDialog.getOpenFileName(self.view, 'Open File', 'datasets')
         if filename[0] == '':
             return
