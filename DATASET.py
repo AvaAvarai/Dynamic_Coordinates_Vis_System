@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-import WARNINGS
+from utils import WARNINGS
 import pandas as pd
 import numpy as np
 import os
@@ -7,7 +7,7 @@ import random
 from ctgan import CTGAN
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
-import COLORS
+from utils import COLORS
 
 
 class Dataset:

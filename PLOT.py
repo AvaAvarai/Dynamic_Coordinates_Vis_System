@@ -9,8 +9,7 @@ from PyQt6.QtCore import *
 
 from typing import List
 import numpy as np
-import GCA, CLIPPING
-from COLORS import getColors, shift_hue
+from utils import GCA, CLIPPING, COLORS
 
 
 def calculate_cubic_bezier_control_points(start, end, radius, attribute_count, is_inner, class_index):
@@ -199,7 +198,7 @@ def draw_unhighlighted_nd_points(dataset, class_vao):
             for l in range(0, len(dataset.positions[i]), dataset.vertex_count):
                 
                 if dataset.trace_mode:
-                    color = shift_hue(color, hue_shift_amount)
+                    color = COLORS.shift_hue(color, hue_shift_amount)
                     hue_shift_amount += 0.02
                 
                 if size_index + datapoint_cnt < len(dataset.vertex_in):
