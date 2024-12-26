@@ -226,8 +226,12 @@ class Dataset:
         # Duplicate the selected rows
         for i in range(len(cloned_rows)):
             new_row = cloned_rows.iloc[i]
+            # append the new row to the dataframe and not_normalized_frame at their class end index (class column)
             self.dataframe = self.dataframe._append(new_row, ignore_index=True)
             self.not_normalized_frame = self.not_normalized_frame._append(new_row, ignore_index=True)
+            # update the frames so the new rows are at their class end index (class column)
+            self.dataframe = self.dataframe.sort_values(by='class', ignore_index=True)
+            self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class', ignore_index=True)
 
         # Update sample count and clipping arrays
         self.sample_count = len(self.dataframe)
@@ -241,7 +245,7 @@ class Dataset:
 
     def generate_data(self, num_samples: int, epochs: int):
         """Generate a specified number of samples using CTGAN."""
-        # Initialize CTGAN
+        # Initialize CTGAN with specified epochs and verbose (disable to run without console output)
         ctgan = CTGAN(epochs=epochs, verbose=True)
 
         # Separate features and labels
