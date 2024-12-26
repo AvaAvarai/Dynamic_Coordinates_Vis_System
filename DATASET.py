@@ -102,6 +102,15 @@ class Dataset:
         else:
             print("No filepath set for reloading.")
 
+    def relabel_samples(self, class_name: str):
+        self.dataframe.loc[self.clipped_samples, 'class'] = class_name
+        self.not_normalized_frame.loc[self.clipped_samples, 'class'] = class_name
+        # update the class counts
+        self.count_per_class = [self.dataframe['class'].tolist().count(name) for name in self.class_names]
+        # sort the dataframe by class
+        self.dataframe = self.dataframe.sort_values(by='class', ignore_index=True)
+        self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class', ignore_index=True)
+
     def inject_datapoint(self, data_point: List[float], class_name: str):
         self.dataframe = self.dataframe._append(pd.Series(data_point + [class_name], index=self.dataframe.columns), ignore_index=True)
         self.not_normalized_frame = self.not_normalized_frame._append(pd.Series(data_point + [class_name], index=self.not_normalized_frame.columns), ignore_index=True)

@@ -257,6 +257,16 @@ class View(QtWidgets.QMainWindow):
             self.plot_layout.addWidget(self.plot_widget)
             self.controller.view.plot_widget.background_color = back_color
             self.controller.view.plot_widget.axes_color = axes_color
+        elif key == QtCore.Qt.Key.Key_R:
+            # relabel the selected samples with a selected class
+            class_name = QtWidgets.QInputDialog.getItem(self, "Select Class", "Select Class", self.controller.data.class_names, 0, False)
+            self.controller.data.relabel_samples(class_name[0])
+            self.controller.data.clear_samples = np.zeros(self.controller.data.sample_count)
+            self.controller.data.clipped_samples = np.zeros(self.controller.data.sample_count)
+            
+            self.refresh()
+            self.controller.display_data()
+            self.create_plot()
             
         elif key == QtCore.Qt.Key.Key_Question:
             # Only proceed if we have clipped samples
