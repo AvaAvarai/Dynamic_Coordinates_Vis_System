@@ -19,7 +19,7 @@ class View(QtWidgets.QMainWindow):
         super(View, self).__init__()
 
         self.controller: controller = controller
-        loadUi('GUI.ui', self)  # load .ui file for GUI made in Qt Designer
+        loadUi('ui/GUI.ui', self)  # load .ui file for GUI made in Qt Designer
 
         self.plot_widget = None
         self.class_table = None
