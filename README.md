@@ -4,6 +4,8 @@ DCVis allows users to interactively build visual ML models for classifying new d
 
 Experiments with DCVis have demonstrated insufficiencies in synthetic data generation and automated data labeling methods such as SMOTE, which are critical for the development of AI/ML models due to the need for large datasets for training. We have developed a new method for synthetic data generation and automated data labeling which is described in [2] using the formerly developed visualization methods for model development from [3]. Next, we are developing new methods for defining the class boundaries in multidimensional data using interactive visual ML [1].
 
+GAN used for naive synthetic data generation is not developed by us, available at [https://github.com/sdv-dev/CTGAN](https://github.com/sdv-dev/CTGAN).
+
 ## Demo Video
 
 Quick 3 minute video [here](https://youtu.be/a0F5xT2oiZ8).
@@ -114,6 +116,8 @@ These features provide an interactive, user-friendly experience for data analysi
 - **Print Samples**: `P` key.
 - **Clone Samples**: `C` key.
 - **Insert Sample**: `I` key.
+- **Relabel Samples**: `R` key.
+- **Generate Synthetic Data via CTGAN**: `G` key.
 
 ## UI Elements
 
@@ -166,10 +170,10 @@ DCVis works with structured numerical datasets and requires a data format of:
 
 These requirements ensure proper data recognition and processing for accurate visualizations in DCVis. Datasets included meet these requirements.
 
-## Visualizations Supported
+## General Line Coordinates Visualizations
 
 Generalized vertex class included for adding visualization methods.  
-This visualization tool features multiple visualisation methods:
+This visualization tool features multiple GLC visualisation methods:
 
 - Parallel Coordinates (PC) ![PC](/screenshots/PC.png)
 - Shifted Paired Coordinates (SPC) ![SPC](/screenshots/SPC.png)
@@ -178,7 +182,7 @@ This visualization tool features multiple visualisation methods:
 - Static Circular Coordinates (SCC) ![SCC](/screenshots/SCC.png)
 - Dynamic Circular Coordinates (DCC) ![DCC](/screenshots/DCC.png)
 
-## Demonstrative Examples
+## Classification Examples
 
 93.33% classification of Iris with three rules found in SPC
 ![Basic SPC classification](/screenshots/SPC_Iris_3_rules_93.png)
@@ -186,11 +190,7 @@ This visualization tool features multiple visualisation methods:
 DCC Iris Setosa and Versicolor classes with LDA coefficients separation
 ![Basic DCC LDA separation](/screenshots/DCC_Setosa_Versicolor_LDA_separation.png)
 
-## Software Issues
-
-If you encounter any problems with the software please submit an issue with screenshots of the behavior occurring and system used.
-
-## Publications Supported
+## Publications
 
 [1] Williams A., Kovalerchuk B., Representation Learning with Visual Knowledge Discovery, Human Computer Interaction International 2025 to be published as proceedings in Springer.
 
@@ -202,6 +202,6 @@ DCVis is a complete rebuild of the [DSCVis](https://github.com/Charles57-CWU/DSC
 
 DCVis is software developed at Central Washington University's Visual Knowledge Discovery and Imaging Lab. Initiated in 2022, the project is built by Alice Williams, James Battistoni IV, Charles Recaido, and led by Dr. Boris Kovalerchuk.
 
-## Licensing
+## License
 
-DCVis is freely and open source software licensed under the MIT License, allowing for both personal and commercial use. For full license details, see the `LICENSE` file.
+DCVis is licensed under the MIT License, allowing for both personal and commercial use. For full license details, see the `LICENSE` file.
