@@ -11,7 +11,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, ExtraTreesClassifier
 from sklearn.tree import DecisionTreeClassifier
 
-import CLASS_TABLE, ATTRIBUTE_TABLE, PLOT
+from ui import CLASS_TABLE, ATTRIBUTE_TABLE, PLOT
 from utils import CLIPPING, WARNINGS
 
 class View(QtWidgets.QMainWindow):

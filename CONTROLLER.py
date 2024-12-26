@@ -1,12 +1,10 @@
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
-from HELP_DIALOG import HelpDialog
-from ABOUT_DIALOG import AboutDialog
+from ui import HELP_DIALOG, ABOUT_DIALOG, CLASS_TABLE
 
 import sys
 
-import DATASET, CLASS_TABLE
-
+import DATASET
 
 class Controller:
     def __init__(self, view, dataset=None):
