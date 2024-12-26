@@ -1,9 +1,4 @@
-import PC
-import SPC
-import DSC1
-import DSC2
-import SCC
-import DCC
+from glcs import PC, SPC, DSC1, DSC2, SCC, DCC
 
 import numpy as np
 
