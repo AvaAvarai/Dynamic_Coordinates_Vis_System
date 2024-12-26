@@ -216,6 +216,10 @@ class Dataset:
         # Restore the preserved class colors mapping
         self.class_colors = [class_color_mapping[class_name] for class_name in self.class_names]
 
+        # sort the dataframe by class
+        self.dataframe = self.dataframe.sort_values(by='class', ignore_index=True)
+        self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class', ignore_index=True)
+
     def copy_clip(self):
         """
         Clone cases with the same values and class colors as the selected (clipped) cases.
