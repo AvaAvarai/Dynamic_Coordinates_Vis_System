@@ -105,6 +105,10 @@ class Dataset:
     def inject_datapoint(self, data_point: List[float], class_name: str):
         self.dataframe = self.dataframe._append(pd.Series(data_point + [class_name], index=self.dataframe.columns), ignore_index=True)
         self.not_normalized_frame = self.not_normalized_frame._append(pd.Series(data_point + [class_name], index=self.not_normalized_frame.columns), ignore_index=True)
+        # update the frames so the new rows are at their class end index (class column)
+        self.dataframe = self.dataframe.sort_values(by='class', ignore_index=True)
+        self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class', ignore_index=True)
+
         self.sample_count += 1
         self.count_per_class[self.class_names.index(class_name)] += 1
         # update clipped_samples array with new sample
