@@ -832,9 +832,9 @@ class Plot(QOpenGLWidget):
                             color = shift_hue(data.class_colors[class_index], hue_shift_amount)
                             hue_shift_amount += 0.02  # Increase hue shift for each attribute or sample
                         elif h == data.attribute_count - 1:
-                            color = shift_hue(data.class_colors[class_index], 0.1)  # Apply a hue shift for the last attribute
+                            color = COLORS.shift_hue(data.class_colors[class_index], 0.1)  # Apply a hue shift for the last attribute
                         else:
-                            color = shift_hue(data.class_colors[class_index], 0)  # No hue shift if not the last attribute or not in trace mode
+                            color = COLORS.shift_hue(data.class_colors[class_index], 0)  # No hue shift if not the last attribute or not in trace mode
                             
                         glColor4ub(color[0], color[1], color[2], data.attribute_alpha - sub_alpha if data.active_attributes[h] else 255 - sub_alpha)
 

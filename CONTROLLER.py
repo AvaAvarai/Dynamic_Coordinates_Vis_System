@@ -21,11 +21,11 @@ class Controller:
         self.view.actionAbout.triggered.connect(self.show_about_dialog)
 
     def show_help_dialog(self):
-        dialog = HelpDialog(self.view)
+        dialog = HELP_DIALOG.HelpDialog(self.view)
         dialog.exec()  # modal dialog
 
     def show_about_dialog(self):
-        dialog = AboutDialog(self.view)
+        dialog = ABOUT_DIALOG.AboutDialog(self.view)
         dialog.exec()  # modal dialog
 
     def setup_connections(self):
