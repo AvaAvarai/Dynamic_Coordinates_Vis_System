@@ -112,8 +112,10 @@ class Dataset:
         self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class', ignore_index=True)
 
     def inject_datapoint(self, data_point: List[float], class_name: str):
-        self.dataframe = self.dataframe._append(pd.Series(data_point + [class_name], index=self.dataframe.columns), ignore_index=True)
-        self.not_normalized_frame = self.not_normalized_frame._append(pd.Series(data_point + [class_name], index=self.not_normalized_frame.columns), ignore_index=True)
+        new_row = pd.DataFrame([data_point + [class_name]], columns=self.dataframe.columns)
+        self.dataframe = pd.concat([self.dataframe, new_row], ignore_index=True)
+        self.not_normalized_frame = pd.concat([self.not_normalized_frame, new_row], ignore_index=True)
+
         # update the frames so the new rows are at their class end index (class column)
         self.dataframe = self.dataframe.sort_values(by='class', ignore_index=True)
         self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class', ignore_index=True)
