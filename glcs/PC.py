@@ -11,15 +11,25 @@ def compute_positions(data, df_name, section_array):
 
     x_coord = np.tile(section_array, reps=len(df_copy.index))
     y_coord = df_copy.to_numpy().ravel()
+    
+    # Apply vertical shifts to the data points
+    for i in range(len(data.axis_vertical_shifts)):
+        shift_indices = range(i, len(y_coord), data.vertex_count)
+        y_coord[shift_indices] += data.axis_vertical_shifts[i]
+    
     pos_array = np.column_stack((x_coord, y_coord))
     return pos_array
 
 
 def compute_axis_positions(data, section_array):
-    axis_vertex_array = [[0, 0], [0, 1]]
-    for idx in range(1, data.vertex_count):
-        axis_vertex_array.append([section_array[idx], 1])
-        axis_vertex_array.append([section_array[idx], 0])
+    axis_vertex_array = []
+    for idx in range(data.vertex_count):
+        # Add vertical shifts to the axis endpoints
+        shift = data.axis_vertical_shifts[idx] if idx < len(data.axis_vertical_shifts) else 0
+        axis_vertex_array.extend([
+            [section_array[idx], 0 + shift],  # Bottom point
+            [section_array[idx], 1 + shift]   # Top point
+        ])
     return axis_vertex_array
 
 

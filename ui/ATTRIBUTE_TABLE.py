@@ -33,6 +33,12 @@ def table_swap(table, dataset, event, replot_func):
     if dataset.plot_type == 'DCC':
         dataset.coefs[moved_from], dataset.coefs[moved_to] = dataset.coefs[moved_to], dataset.coefs[moved_from]
 
+    if dataset.plot_type == 'PC':
+        # Swap the vertical shifts as well
+        place_holder = dataset.axis_vertical_shifts[moved_from]
+        dataset.axis_vertical_shifts[moved_from] = dataset.axis_vertical_shifts[moved_to]
+        dataset.axis_vertical_shifts[moved_to] = place_holder
+
     replot_func()
 
 
@@ -61,13 +67,19 @@ class AttributeTable(QtWidgets.QTableWidget):
         self.dataset = dataset
         self.replot_func = replot_func
 
-        if not self.dataset.plot_type == 'DCC':
-            self.setColumnCount(3)
+        if self.dataset.plot_type == 'PC':
+            self.setColumnCount(4)
+            self.setHorizontalHeaderItem(0, QtWidgets.QTableWidgetItem('Order'))
+            self.setHorizontalHeaderItem(1, QtWidgets.QTableWidgetItem('Alpha'))
             self.setHorizontalHeaderItem(2, QtWidgets.QTableWidgetItem('Invert'))
-        else:
+            self.setHorizontalHeaderItem(3, QtWidgets.QTableWidgetItem('Position'))
+        elif self.dataset.plot_type == 'DCC':
             self.setColumnCount(4)
             self.setHorizontalHeaderItem(2, QtWidgets.QTableWidgetItem('Coefficient'))
             self.setHorizontalHeaderItem(3, QtWidgets.QTableWidgetItem('Value'))
+        else:
+            self.setColumnCount(3)
+            self.setHorizontalHeaderItem(2, QtWidgets.QTableWidgetItem('Invert'))
         self.setHorizontalHeaderItem(0, QtWidgets.QTableWidgetItem('Order'))
         self.setHorizontalHeaderItem(1, QtWidgets.QTableWidgetItem('Alpha'))
             
@@ -84,7 +96,10 @@ class AttributeTable(QtWidgets.QTableWidget):
         else:
             header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
 
-        if self.dataset.plot_type == 'DCC':
+        if self.dataset.plot_type == 'PC':
+            for idx in range(self.dataset.attribute_count):
+                self.init_pc_row(idx)
+        elif self.dataset.plot_type == 'DCC':
             for idx in range(self.dataset.attribute_count):
                 self.init_dcc_row(idx, self.dataset.attribute_count)
         for idx, attribute_name in enumerate(self.dataset.attribute_names):
@@ -137,6 +152,40 @@ class AttributeTable(QtWidgets.QTableWidget):
 
         # Clear all the contents of the table after removing widgets
         self.clearContents()
+
+    def init_pc_row(self, idx):
+        # Initialize vertical position slider
+        slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
+        slider.setMinimum(-100)
+        slider.setMaximum(100)
+        slider.setValue(int(self.dataset.axis_vertical_shifts[idx] * 100))  # Set initial value
+        
+        # Create a widget to hold the slider
+        container = QtWidgets.QWidget()
+        layout = QtWidgets.QHBoxLayout(container)
+        
+        # Add a label to show the current value
+        value_label = QtWidgets.QLabel(f"{slider.value()}")
+        value_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        value_label.setMinimumWidth(30)
+        
+        def on_value_changed(value):
+            value_label.setText(f"{value}")
+            self.update_axis_position(idx, value)
+            
+        slider.valueChanged.connect(on_value_changed)
+        
+        layout.addWidget(slider)
+        layout.addWidget(value_label)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        
+        self.setCellWidget(idx, 3, container)
+
+    def update_axis_position(self, idx, value):
+        # Update the axis vertical position
+        self.dataset.axis_vertical_shifts[idx] = value / 100  # Convert to range [-1, 1]
+        self.replot_func()
 
 
 class CheckBox(QtWidgets.QCheckBox):

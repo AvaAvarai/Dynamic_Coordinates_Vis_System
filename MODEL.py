@@ -72,6 +72,8 @@ class Dataset:
         self.attribute_order: List[int] = []
         self.all_arc_lengths: List[int] = []
 
+        self.axis_vertical_shifts = np.zeros(self.attribute_count)  # Store vertical shifts for PC axes
+
     def duplicate_last_attribute(self):
         if self.dataframe is None or self.dataframe.empty:
             print("DataFrame is not loaded or is empty.")
@@ -176,6 +178,9 @@ class Dataset:
         self.attribute_order = np.arange(0, self.attribute_count)
         self.max_radial_distances = [0] * self.attribute_count
         self.coefs = np.ones(self.attribute_count) * 100
+
+        # Initialize axis_vertical_shifts with the correct size
+        self.axis_vertical_shifts = np.zeros(self.attribute_count)
 
         self.active_attributes = np.repeat(True, self.attribute_count)
         self.attribute_inversions = np.repeat(False, self.attribute_count)
