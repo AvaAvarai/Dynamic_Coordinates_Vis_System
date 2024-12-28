@@ -14,7 +14,8 @@ class AboutDialog(QDialog):
         layout.addWidget(header)
         
         about_info = """
-        This project is a Visual Knowledge Discovery system using the lossless multidimensional General Line Coordinates (GLC) for building visual machine learning models, generate synthetic data, and edit data characteristics by data domain expert.
+        This project is a Visual Knowledge Discovery system using the lossless multidimensional General Line Coordinates (GLC)
+        for building visual machine learning models, generate synthetic data, and edit data characteristics by data domain expert.
         
         Key Features:
           • Multidimensional data visualization
