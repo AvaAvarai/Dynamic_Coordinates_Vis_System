@@ -19,6 +19,9 @@ class Dataset:
         self.dataframe: Optional[pd.DataFrame] = None
 
         self.not_normalized_frame: Optional[pd.DataFrame] = None
+        
+        self.min_values: Optional[pd.DataFrame] = None
+        self.max_values: Optional[pd.DataFrame] = None
 
         # class information
         self.class_count: int = 0
@@ -112,9 +115,19 @@ class Dataset:
         self.not_normalized_frame = self.not_normalized_frame.sort_values(by='class', ignore_index=True)
 
     def inject_datapoint(self, data_point: List[float], class_name: str):
-        new_row = pd.DataFrame([data_point + [class_name]], columns=self.dataframe.columns)
-        self.dataframe = pd.concat([self.dataframe, new_row], ignore_index=True)
-        self.not_normalized_frame = pd.concat([self.not_normalized_frame, new_row], ignore_index=True)
+        # Create a new row for the normalized DataFrame
+        new_row_normalized = pd.DataFrame([data_point + [class_name]], columns=self.dataframe.columns)
+        
+        new_row_nonnormalized = pd.DataFrame([data_point + [class_name]], columns=self.not_normalized_frame.columns)
+        
+        # denormalize the new row by using the min and max of the original data csv
+        new_row_nonnormalized[self.attribute_names] = new_row_normalized[self.attribute_names] * (self.max_values - self.min_values) + self.min_values
+        
+        # Inject into the normalized DataFrame
+        self.dataframe = pd.concat([self.dataframe, new_row_normalized], ignore_index=True)
+        
+        # Inject into the non-normalized DataFrame
+        self.not_normalized_frame = pd.concat([self.not_normalized_frame, new_row_nonnormalized], ignore_index=True)
 
         # update the frames so the new rows are at their class end index (class column)
         self.dataframe = self.dataframe.sort_values(by='class', ignore_index=True)
@@ -122,6 +135,7 @@ class Dataset:
 
         self.sample_count += 1
         self.count_per_class[self.class_names.index(class_name)] += 1
+        
         # update clipped_samples array with new sample
         self.clipped_samples = np.append(self.clipped_samples, False)
         self.clear_samples = np.append(self.clear_samples, False)
@@ -173,6 +187,10 @@ class Dataset:
         self.clear_samples = np.repeat(False, self.sample_count)
         self.vertex_in = np.repeat(False, self.sample_count)
         self.last_vertex_in = np.repeat(False, self.sample_count)
+
+        # get min and max values excluding the class column
+        self.min_values = df.drop(df.columns[df.columns.str.lower() == 'class'], axis=1).min()
+        self.max_values = df.drop(df.columns[df.columns.str.lower() == 'class'], axis=1).max()
 
         # general dataframe
         self.dataframe = df
