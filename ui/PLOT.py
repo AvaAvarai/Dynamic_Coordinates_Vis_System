@@ -732,7 +732,7 @@ class Plot(QOpenGLWidget):
                     color = data.class_colors[class_index]
                     # last marker hue shift
                     if j == data.vertex_count - 1:
-                        color = shift_hue(color, hue_shift)
+                        color = COLORS.shift_hue(color, hue_shift)
 
                     was_inner = False
                     is_inner = class_index == data.class_order[0] and not class_count_one
