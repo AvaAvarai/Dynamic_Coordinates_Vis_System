@@ -8,33 +8,40 @@ class HelpDialog(QDialog):
 
     def init_ui(self):
         layout = QVBoxLayout()
+        
+        header = QLabel("Keyboard Controls and Shortcuts")
+        header.setStyleSheet("font-size: 16px; font-weight: bold;")
+        layout.addWidget(header)
+        
         controls_info = """
-        Keyboard Shortcuts for UI Controls:
-          F1: Load Dataset
-          F2: Recenter Plot
-          F3: Create Plot
-          F4: Refresh Plot
-          ESC: Exit Application
-          
-        Keyboard Controls for Data Points:
-          Q: Roll selected data points backward
-          E: Roll selected data points forward
-          W: Move selected data points up
-          S: Move selected data points down
-          D: Delete selected data points
-          C: Clone selected data points
-          I: Insert new data point of selected class
-          P: Print the highlighted case details to the console
-          ?: Infers the class of the highlighted case(s).
-          G: Generate a specified number of data points (currently completely random)
-          R: Relabel the selected data points with a selected class
+          • UI Controls:
+            F1: Load CSV/TXT Dataset from file
+            F2: Recenter visualization plot
+            F3: Create visualization plot
+            F4: Refresh visualization plot
+            ESC: Exit DCVis application
             
-        Mouse Controls for Plot Interaction:
-          Left Click: Select and highlight data points.
-          Right Click: Set clipping boundaries or clear data.
-          Middle Click and Drag: Pan the plot.
-          Middle Click and Hold: Grow selection box.
-          Scroll Wheel: Zoom in and out on the plot.
+          • Selected Data Points:
+            Q: Roll (select next) selected data points backward
+            E: Roll (select previous)selected data points forward
+            W: Move selected data points up
+            S: Move selected data points down
+            D: Delete selected data points
+            C: Clone selected data points
+            I: Insert new data point of chosen class
+            P: Print the selected data points details to the console
+            
+          • Synthetic Data Generation:  
+            G: Generate a specified number of data points with CTGAN over chosen epochs
+            ?: Infers the class of the highlighted case(s) with a vote of standard machine learning models
+            R: Relabel the selected data points with a chosen class
+              
+          • Visualization Plot Interaction:
+            Left Click: Select and highlight data points.
+            Right Click: Set clipping boundaries or clear data.
+            Middle Click and Drag: Pan the plot.
+            Middle Click and Hold: Grow selection box.
+            Scroll Wheel: Zoom in and out on the plot.
         
         For deleting associative rules can right click and delete individual rules or click the clear all rules button.
         
@@ -47,6 +54,7 @@ class HelpDialog(QDialog):
         """
         
         label = QLabel(controls_info)
+        label.setStyleSheet("font-size: 14px;")
         layout.addWidget(label)
         button = QPushButton("Close", clicked=self.accept)
         layout.addWidget(button)

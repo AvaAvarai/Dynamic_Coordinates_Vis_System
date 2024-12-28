@@ -16,10 +16,9 @@ class AboutDialog(QDialog):
         Central Washington University's Visual Knowledge Discovery and Imaging Lab.
 
         Our system is designed to support features of:
-            multidimensional data visualization
-            data classification
-            data mining
-            synthetic data generation
+          • Multidimensional data visualization
+          • Data classification
+          • Synthetic data generation
         
         Please see the README.md file for more information.
         
@@ -27,6 +26,7 @@ class AboutDialog(QDialog):
         """
         
         label = QLabel(about_info)
+        label.setStyleSheet("font-size: 14px;")
         layout.addWidget(label)
         button = QPushButton("Close", clicked=self.accept)
         layout.addWidget(button)
