@@ -30,6 +30,7 @@ class HelpDialog(QDialog):
             C: Clone selected data points
             I: Insert new data point of chosen class
             P: Print the selected data points details to the console
+            L: Align the selected data points in parallel coordinates
             
           • Synthetic Data Generation:  
             G: Generate a specified number of data points with CTGAN over chosen epochs
