@@ -285,7 +285,7 @@ class Dataset:
         self.vertex_in = np.append(self.vertex_in, [False] * len(cloned_rows))
         self.last_vertex_in = np.append(self.last_vertex_in, [False] * len(cloned_rows))
 
-    def generate_data(self, num_samples: int, epochs: int):
+    def generate_data(self, num_samples: int, epochs: int, retain_data: bool = False):
         """Generate a specified number of samples using CTGAN."""
         # Initialize CTGAN with specified epochs and verbose (disable to run without console output)
         ctgan = CTGAN(epochs=epochs, verbose=True)
@@ -314,7 +314,10 @@ class Dataset:
         synthetic_features = synthetic_data.drop(columns=['class_encoded'])
         synthetic_labels = synthetic_data['class_encoded']
 
-        # Inject synthetic samples into the dataframe
+        # Clear the dataframe and inject synthetic samples
+        if not retain_data:
+            self.dataframe = pd.DataFrame(columns=self.attribute_names + ['class'])
+            self.not_normalized_frame = pd.DataFrame(columns=self.attribute_names + ['class'])
         for i in range(len(synthetic_features)):
             self.inject_datapoint(synthetic_features.iloc[i].tolist(), synthetic_labels.iloc[i])
 

@@ -239,13 +239,16 @@ class View(QtWidgets.QMainWindow):
             epochs_spinbox.setValue(1000)
             layout.addWidget(epochs_spinbox)
 
+            retain_data_checkbox = QtWidgets.QCheckBox("Retain previous data")
+            layout.addWidget(retain_data_checkbox)
+
             buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
             layout.addWidget(buttons)
             buttons.accepted.connect(dialog.accept)
             buttons.rejected.connect(dialog.reject)
 
             if dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-                self.controller.data.generate_data(num_samples_spinbox.value(), epochs_spinbox.value())
+                self.controller.data.generate_data(num_samples_spinbox.value(), epochs_spinbox.value(), retain_data_checkbox.isChecked())
             else:
                 return
             self.controller.display_data()
@@ -257,6 +260,7 @@ class View(QtWidgets.QMainWindow):
             self.plot_layout.addWidget(self.plot_widget)
             self.controller.view.plot_widget.background_color = back_color
             self.controller.view.plot_widget.axes_color = axes_color
+        
         elif key == QtCore.Qt.Key.Key_R:
             # relabel the selected samples with a selected class
             class_name = QtWidgets.QInputDialog.getItem(self, "Select Class", "Select Class", self.controller.data.class_names, 0, False)
