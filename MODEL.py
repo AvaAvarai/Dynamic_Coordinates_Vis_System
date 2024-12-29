@@ -107,6 +107,27 @@ class Dataset:
         else:
             print("No filepath set for reloading.")
 
+    def adjust_axis_shifts(self):
+        """
+        Adjust each attribute's vertical shift so that, for the clipped (selected) samples,
+        all attributes share the same mean as the first attribute's clipped-sample mean.
+        In parallel coordinates, this yields a 'straight horizontal line' appearance
+        for those polylines.
+        """
+        # If no samples are clipped, nothing to align
+        if not any(self.clipped_samples):
+            print("No samples selected (clipped). Nothing to align.")
+            return
+
+        # Reference mean = mean value of the clipped samples for the first attribute
+        ref_attr = self.attribute_names[0]
+        reference_mean = self.dataframe.loc[self.clipped_samples, ref_attr].mean()
+
+        for i, attr_name in enumerate(self.attribute_names):
+            current_mean = self.dataframe.loc[self.clipped_samples, attr_name].mean()
+            # We want current_mean to align with reference_mean
+            self.axis_vertical_shifts[i] = reference_mean - current_mean
+    
     def relabel_samples(self, class_name: str):
         self.dataframe.loc[self.clipped_samples, 'class'] = class_name
         self.not_normalized_frame.loc[self.clipped_samples, 'class'] = class_name

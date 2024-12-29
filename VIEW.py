@@ -312,6 +312,14 @@ class View(QtWidgets.QMainWindow):
             
             # Create and show results table
             self.show_inference_results(results, X_test.index)
+
+        elif key == QtCore.Qt.Key.Key_L:
+            # if in parallel coordinates and there is selected samples, adjust the axis vertical shifts
+            # adjust the vertical shifts so that the selected samples are in a straight horizontal line.
+            if self.controller.data.plot_type == 'PC':
+                self.controller.data.adjust_axis_shifts()
+            self.refresh()
+            self.create_plot()
             
     def show_inference_results(self, results, sample_indices):
         """Display the inference results in a table."""
