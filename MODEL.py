@@ -339,6 +339,11 @@ class Dataset:
         if not retain_data:
             self.dataframe = pd.DataFrame(columns=self.attribute_names + ['class'])
             self.not_normalized_frame = pd.DataFrame(columns=self.attribute_names + ['class'])
+            # update clipped_samples array with new sample
+            self.clipped_samples = np.append(self.clipped_samples, False)
+            self.clear_samples = np.append(self.clear_samples, False)
+            self.sample_count = len(self.dataframe)
+            self.count_per_class = [self.dataframe['class'].tolist().count(name) for name in self.class_names]
         for i in range(len(synthetic_features)):
             self.inject_datapoint(synthetic_features.iloc[i].tolist(), synthetic_labels.iloc[i])
 

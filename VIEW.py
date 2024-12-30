@@ -249,6 +249,7 @@ class View(QtWidgets.QMainWindow):
 
             if dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 self.controller.data.generate_data(num_samples_spinbox.value(), epochs_spinbox.value(), retain_data_checkbox.isChecked())
+                self.controller.display_data()
             else:
                 return
             self.controller.display_data()
