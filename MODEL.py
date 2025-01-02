@@ -285,6 +285,10 @@ class Dataset:
 
         # Filter rows to clone
         cloned_rows = self.dataframe.iloc[clipped_indices].copy()
+        original_sample_count = self.sample_count
+
+        # Reset clipped samples array
+        self.clipped_samples = np.zeros(self.sample_count, dtype=bool)
 
         # Duplicate the selected rows
         for i in range(len(cloned_rows)):
@@ -300,11 +304,26 @@ class Dataset:
         self.sample_count = len(self.dataframe)
         # update the class counts
         self.count_per_class = [self.dataframe['class'].tolist().count(name) for name in self.class_names]
-        self.clipped_samples = np.append(self.clipped_samples, [False] * len(cloned_rows))
-        self.clear_samples = np.append(self.clear_samples, [False] * len(cloned_rows))
         
-        self.vertex_in = np.append(self.vertex_in, [False] * len(cloned_rows))
-        self.last_vertex_in = np.append(self.last_vertex_in, [False] * len(cloned_rows))
+        # Create new arrays with proper size
+        new_clipped = np.zeros(self.sample_count, dtype=bool)
+        new_clear = np.zeros(self.sample_count, dtype=bool)
+        new_vertex_in = np.zeros(self.sample_count, dtype=bool)
+        new_last_vertex_in = np.zeros(self.sample_count, dtype=bool)
+        
+        # Select the newly added samples (they will be at the end of their respective classes)
+        for class_name in self.class_names:
+            class_mask = self.dataframe['class'] == class_name
+            class_indices = np.where(class_mask)[0]
+            original_count = len(cloned_rows[cloned_rows['class'] == class_name])
+            if original_count > 0:
+                new_clipped[class_indices[-original_count:]] = True
+        
+        # Update the arrays
+        self.clipped_samples = new_clipped
+        self.clear_samples = new_clear
+        self.vertex_in = new_vertex_in
+        self.last_vertex_in = new_last_vertex_in
 
     def generate_data(self, num_samples: int, epochs: int, retain_data: bool = False):
         """Generate a specified number of samples using CTGAN."""
@@ -369,16 +388,29 @@ class Dataset:
 
             proportional_delta = move_delta / normalized_range
             
-            # Calculate the proportional move for the normalized and not_normalized frames
-            if self.dataframe.loc[bool_clipped, attribute].min() + proportional_delta > 0 and self.dataframe.loc[bool_clipped, attribute].max() + proportional_delta < 1:
-                not_normalized_range = self.not_normalized_frame[attribute].max() - self.not_normalized_frame[attribute].min()
-                if not_normalized_range == 0:
-                    continue  # Skip attributes with no variation
+            # Apply the move without boundary checks
+            not_normalized_range = self.not_normalized_frame[attribute].max() - self.not_normalized_frame[attribute].min()
+            if not_normalized_range == 0:
+                continue  # Skip attributes with no variation
 
-                not_normalized_proportional_delta = proportional_delta * not_normalized_range
-                self.not_normalized_frame[attribute] = self.not_normalized_frame[attribute].astype(float)
-                self.dataframe.loc[bool_clipped, attribute] += proportional_delta
-                self.not_normalized_frame.loc[bool_clipped, attribute] += not_normalized_proportional_delta
+            not_normalized_proportional_delta = proportional_delta * not_normalized_range
+            self.not_normalized_frame[attribute] = self.not_normalized_frame[attribute].astype(float)
+            self.dataframe.loc[bool_clipped, attribute] += proportional_delta
+            self.not_normalized_frame.loc[bool_clipped, attribute] += not_normalized_proportional_delta
+
+            # After moving, check if we need to update min/max values
+            current_min = self.dataframe[attribute].min()
+            current_max = self.dataframe[attribute].max()
+            
+            if current_min < 0 or current_max > 1:
+                # Renormalize the entire column to [0,1]
+                min_val = self.dataframe[attribute].min()
+                max_val = self.dataframe[attribute].max()
+                self.dataframe[attribute] = (self.dataframe[attribute] - min_val) / (max_val - min_val)
+                
+                # Update the not_normalized_frame min/max values
+                self.min_values[attribute] = self.not_normalized_frame[attribute].min()
+                self.max_values[attribute] = self.not_normalized_frame[attribute].max()
 
     def load_from_csv(self, filename: str):
         """Load the dataset from a CSV file."""
