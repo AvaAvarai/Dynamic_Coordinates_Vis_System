@@ -1,6 +1,7 @@
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QColor, QBrush
+import numpy as np
 
 
 def reset_checkmarks(table, count):
@@ -55,6 +56,9 @@ class ClassTable(QtWidgets.QTableWidget):
         self.data = dataset
         self.refresh_GUI.connect(self.parent().refresh)
         
+        # Add mouse tracking to enable click detection
+        self.setMouseTracking(True)
+        
         if not (self.data.plot_type == 'SCC' or self.data.plot_type == 'DCC'):
             self.setColumnCount(4)
             self.setHorizontalHeaderItem(3, QtWidgets.QTableWidgetItem('Color'))
@@ -79,7 +83,11 @@ class ClassTable(QtWidgets.QTableWidget):
         counter = 0
         for ele in dataset.class_names:
             class_name = QtWidgets.QTableWidgetItem(str(ele))
-            class_name.setForeground(QBrush(QColor(dataset.class_colors[dataset.class_order[counter]][0], dataset.class_colors[dataset.class_order[counter]][1], dataset.class_colors[dataset.class_order[counter]][2])))
+            class_name.setForeground(QBrush(QColor(dataset.class_colors[dataset.class_order[counter]][0], 
+                                                  dataset.class_colors[dataset.class_order[counter]][1], 
+                                                  dataset.class_colors[dataset.class_order[counter]][2])))
+            # Make the item selectable
+            class_name.setFlags(class_name.flags() | Qt.ItemFlag.ItemIsSelectable)
             self.setItem(counter, 0, class_name)
 
             class_checkbox = CheckBox(counter, dataset, self.refresh_GUI, 'class', parent=self)
@@ -98,6 +106,24 @@ class ClassTable(QtWidgets.QTableWidget):
                 self.setCellWidget(counter, 3, button)
 
             counter += 1
+
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        
+        # Get the item at the clicked position
+        item = self.itemAt(event.pos())
+        if item and item.column() == 0:  # Only respond to clicks in the first column (class names)
+            class_name = item.text()
+            
+            # Reset previous selections
+            self.data.clipped_samples = np.zeros(self.data.sample_count, dtype=bool)
+            
+            # Select all samples of the clicked class
+            class_mask = self.data.dataframe['class'] == class_name
+            self.data.clipped_samples[class_mask] = True
+            
+            # Refresh the visualization
+            self.refresh_GUI.emit()
 
 
 # class button for changing color
