@@ -86,8 +86,8 @@ class ClassTable(QtWidgets.QTableWidget):
             class_name.setForeground(QBrush(QColor(dataset.class_colors[dataset.class_order[counter]][0], 
                                                   dataset.class_colors[dataset.class_order[counter]][1], 
                                                   dataset.class_colors[dataset.class_order[counter]][2])))
-            # Make the item selectable
-            class_name.setFlags(class_name.flags() | Qt.ItemFlag.ItemIsSelectable)
+            # Make the item selectable and editable
+            class_name.setFlags(class_name.flags() | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable)
             self.setItem(counter, 0, class_name)
 
             class_checkbox = CheckBox(counter, dataset, self.refresh_GUI, 'class', parent=self)
@@ -107,6 +107,9 @@ class ClassTable(QtWidgets.QTableWidget):
 
             counter += 1
 
+        # Connect the itemChanged signal
+        self.itemChanged.connect(self.on_item_changed)
+
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
         
@@ -124,6 +127,27 @@ class ClassTable(QtWidgets.QTableWidget):
             
             # Refresh the visualization
             self.refresh_GUI.emit()
+
+    def on_item_changed(self, item):
+        """Handle class name changes while maintaining data binding"""
+        if item.column() == 0:  # Only handle changes to class names
+            old_name = self.data.class_names[item.row()]
+            new_name = item.text()
+            
+            if old_name != new_name:
+                # Update the class name in the dataset
+                self.data.class_names[item.row()] = new_name
+                
+                # Update the class name in both dataframes
+                self.data.dataframe.loc[self.data.dataframe['class'] == old_name, 'class'] = new_name
+                self.data.not_normalized_frame.loc[self.data.not_normalized_frame['class'] == old_name, 'class'] = new_name
+                
+                # Update class counts
+                self.data.count_per_class = [self.data.dataframe['class'].tolist().count(name) 
+                                           for name in self.data.class_names]
+                
+                # Refresh the visualization
+                self.refresh_GUI.emit()
 
 
 # class button for changing color
