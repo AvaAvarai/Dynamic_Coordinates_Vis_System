@@ -410,8 +410,8 @@ class Plot(QOpenGLWidget):
         self.prev_horiz = None  # need previous x location
         self.prev_vert = None  # need previous y location
 
-        self.background_color = [239 / 255, 239 / 255, 239 / 255, 1]  # Default gray in RGBA
-        self.axes_color = [0, 0, 0, 0]  # Default black
+        self.background_color = [239 / 255, 239 / 255, 239 / 255, 1]  # Light gray background
+        self.axes_color = [0.0, 0.0, 0.0, 1.0]  # Black axes
 
         self.highlight_overlaps = self.data.plot_type in ['SCC', 'DCC']
         replot_overlaps_box.setChecked(self.highlight_overlaps)

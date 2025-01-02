@@ -74,6 +74,9 @@ class Dataset:
 
         self.axis_vertical_shifts = np.zeros(self.attribute_count)  # Store vertical shifts for PC axes
 
+        # plot information
+        self.axis_color: List[float] = [0.0, 0.0, 0.0, 1.0]  # Default black color for axes
+
     def duplicate_last_attribute(self):
         if self.dataframe is None or self.dataframe.empty:
             print("DataFrame is not loaded or is empty.")
